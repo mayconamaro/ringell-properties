@@ -20,11 +20,10 @@ genTypeS' n | n>0 =
 instance Arbitrary TypeS where
   arbitrary = genTypeS
 
-newName' :: [String] -> Context -> String
-newName' (x:xs) ctx = if x `elem` (map fst ctx) then newName' xs ctx else x
-
 newName :: Context -> String
 newName = newName' [ 'x' : show n | n <- [0..] ]
+ where 
+   newName' (x:xs) ctx = if x `elem` (map fst ctx) then newName' xs ctx else x
 
 genExpS' :: Int -> Context -> TypeS -> Maybe String -> Gen ExpS
 genExpS' 0 ctx NatS Nothing 
@@ -132,3 +131,26 @@ propEval p = el == er
 
 propSemPreservation :: ProgS -> Property
 propSemPreservation p = (propOutOfFuel p) ==> (propEval p)
+
+propTrivialShowP :: ProgS -> Bool
+propTrivialShowP x = show x == show x
+
+propTrivialShowR :: ProgS -> Bool
+propTrivialShowR x = show (progStoExpR x) == show (progStoExpR x)
+
+propTrivialShowL :: ProgS -> Bool
+propTrivialShowL x = show (progStoExpL x) == show (progStoExpL x)
+
+propTrivialShow :: ProgS -> Property
+propTrivialShow p = (propTrivialShowP p) .&&. (propTrivialShowR p) .&&. (propTrivialShowL p)
+
+genName :: Gen Name
+genName = do 
+          i <- choose (0, 50)
+          oneof [return (Local i), return (Quote i)]
+          
+instance Arbitrary Name where
+  arbitrary = genName
+
+propTrivialShowName :: Name -> Bool
+propTrivialShowName n = (show n) == (show n)

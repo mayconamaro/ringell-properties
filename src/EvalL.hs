@@ -1,12 +1,13 @@
 module EvalL where
 
+import EvalR (Name)
 import Semantic
 
 {-- High Order Abstract Syntax by McBride --}
 
-data Name = Local Int
-          | Quote Int
-          deriving (Eq, Show)
+-- data Name = Local Int
+--           | Quote Int
+--           deriving (Show)
 
 data ExpL = Free Name 
           | Bound Int
@@ -16,7 +17,7 @@ data ExpL = Free Name
           | SucL ExpL
           | AbsL ExpL
           | MatchL ExpL ExpL ExpL 
-          deriving (Eq, Show)
+          deriving (Show)
 
 data VNum = VZero
           | VSuc VNum
@@ -32,10 +33,7 @@ data Neutral = NFree Name
 type Env = [Value]
 
 eval :: ExpL -> Env -> Value
-eval (Free x)          env = vfree x
-eval (Bound i)         env = if i >= length env 
-                                then error $ "Tried to access index " ++ show i ++ " in " ++ show (map quote env) 
-                                else env !! i
+eval (Bound i)         env = partialIf (i < length env) (env !! i)
 eval (Error)           env = VError
 eval (AppL e1 e2)      env = vapp (eval e1 env) (eval e2 env)
 eval (AbsL e)          env = VAbs (\x -> eval e (x:env))
@@ -47,7 +45,6 @@ vmatch :: Value -> Env -> ExpL -> ExpL -> Value
 vmatch (VNumber VZero)     env e1 _ = eval e1 env
 vmatch (VNumber (VSuc x))  env _ e2 = eval e2 ((VNumber x):env)
 vmatch (VError)            env _ _  = VError
-vmatch e                   _   _ _  = error $ "tried to match " ++ show (quote e)
 
 vsuc :: Value -> Value
 vsuc (VNumber n) = VNumber (VSuc n)
@@ -56,28 +53,27 @@ vapp :: Value -> Value -> Value
 vapp (VError)     _      = VError
 vapp _            VError = VError    
 vapp (VAbs f)     v      = f v
-vapp (VNeutral n) v      = VNeutral (NApp n v)
 
-vfree :: Name -> Value
-vfree n = VNeutral (NFree n)
+-- vfree :: Name -> Value
+-- vfree n = VNeutral (NFree n)
 
 quote :: Value -> ExpL
 quote = quote' 0
 
 quote' :: Int -> Value -> ExpL
-quote' i (VAbs f)           = AbsL (quote' (i + 1) (f (vfree (Quote i))))
+--quote' i (VAbs f)           = AbsL (quote' (i + 1) (f (vfree (Quote i))))
 quote' i (VNumber VZero)    = ZeroL
 quote' i (VNumber (VSuc n)) = SucL (quote' i (VNumber n)) 
 quote' i (VError)           = Error 
-quote' i (VNeutral n)       = neutralQuote i n
+-- quote' i (VNeutral n)       = neutralQuote i n
 
-neutralQuote :: Int -> Neutral -> ExpL
-neutralQuote i (NFree x)  = boundfree i x
-neutralQuote i (NApp n v) = AppL (neutralQuote i n) (quote' i v) 
+-- neutralQuote :: Int -> Neutral -> ExpL
+-- neutralQuote i (NFree x)  = boundfree i x
+-- neutralQuote i (NApp n v) = AppL (neutralQuote i n) (quote' i v) 
 
-boundfree :: Int -> Name -> ExpL
-boundfree i (Quote k) = Bound (i - k - 1)
-boundfree i  x        = Free x  
+-- boundfree :: Int -> Name -> ExpL
+-- boundfree i (Quote k) = Bound (i - k - 1)
+-- boundfree i  x        = Free x  
 
 expStoExpL :: ExpS -> Context -> [String] -> ExpL
 expStoExpL (VarS v)               ctx s = if elem v s then Error else Bound (find v ctx)

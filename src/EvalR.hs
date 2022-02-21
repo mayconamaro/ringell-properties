@@ -6,7 +6,7 @@ import Semantic
 
 data Name = Local Int
           | Quote Int
-          deriving (Eq, Show)
+          deriving (Show)
 
 data ExpR = Free Name 
           | Bound Int
@@ -15,7 +15,7 @@ data ExpR = Free Name
           | SucR ExpR
           | AbsR ExpR
           | MatchR ExpR ExpR ExpR
-          deriving (Eq, Show)
+          deriving (Show)
 
 data VNum = VZero
           | VSuc VNum
@@ -30,10 +30,7 @@ data Neutral = NFree Name
 type Env = [Value]
 
 evalR :: ExpR -> Env -> Value
-evalR (Free x)          env = vfree x
-evalR (Bound i)         env = if i >= length env 
-                                then error $ "Tried to access index " ++ show i ++ " in " ++ show (map quoteR env) 
-                                else env !! i
+evalR (Bound i)         env = partialIf (i < length env) (env !! i)
 evalR (AppR e1 e2)      env = vapp (evalR e1 env) (evalR e2 env)
 evalR (AbsR e)          env = VAbs (\x -> evalR e (x:env))
 evalR (ZeroR)           env = VNumber VZero
@@ -50,27 +47,26 @@ vsuc (VNumber n) = VNumber (VSuc n)
 
 vapp :: Value -> Value -> Value 
 vapp (VAbs f)     v       = f v
-vapp (VNeutral n) v       = VNeutral (NApp n v)
 
-vfree :: Name -> Value
-vfree n = VNeutral (NFree n)
+-- vfree :: Name -> Value
+-- vfree n = VNeutral (NFree n)
 
 quoteR :: Value -> ExpR
 quoteR = quote' 0
 
 quote' :: Int -> Value -> ExpR
-quote' i (VAbs f)           = AbsR (quote' (i + 1) (f (vfree (Quote i))))
+-- quote' i (VAbs f)           = AbsR (quote' (i + 1) (f (vfree (Quote i))))
 quote' i (VNumber VZero)    = ZeroR
 quote' i (VNumber (VSuc n)) = SucR (quote' i (VNumber n)) 
-quote' i (VNeutral n)       = neutralQuote i n
+-- quote' i (VNeutral n)       = neutralQuote i n
 
-neutralQuote :: Int -> Neutral -> ExpR
-neutralQuote i (NFree x)  = boundfree i x
-neutralQuote i (NApp n v) = AppR (neutralQuote i n) (quote' i v) 
+-- neutralQuote :: Int -> Neutral -> ExpR
+-- neutralQuote i (NFree x)  = boundfree i x
+-- neutralQuote i (NApp n v) = AppR (neutralQuote i n) (quote' i v) 
 
-boundfree :: Int -> Name -> ExpR
-boundfree i (Quote k) = Bound (i - k - 1)
-boundfree i  x        = Free x  
+-- boundfree :: Int -> Name -> ExpR
+-- boundfree i (Quote k) = Bound (i - k - 1)
+-- boundfree i  x        = Free x  
 
 expStoExpR :: ExpS -> Context -> ExpR
 expStoExpR (VarS v)               ctx = Bound (find v ctx)
