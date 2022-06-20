@@ -1,6 +1,6 @@
-name:                ringell-properties
+name:                pcf-gen
 version:             0.1.0.0
-github:              "githubuser/ringell-properties"
+github:              "githubuser/pcf-gen"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "example@example.com"
@@ -17,16 +17,20 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/ringell-properties#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/pcf-gen#readme>
 
 dependencies:
 - base >= 4.7 && < 5
+- unbound-generics
+- QuickCheck
+- mtl
+- quickcheck-transformer
 
 library:
   source-dirs: src
 
 executables:
-  ringell-properties-exe:
+  pcf-gen-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -34,10 +38,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - ringell-properties
+    - pcf-gen
 
 tests:
-  ringell-properties-test:
+  pcf-gen-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -45,5 +49,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - QuickCheck >= 2.14.2 && < 3
-    - ringell-properties
+    - pcf-gen

@@ -1,14 +1,14 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.34.6.
 --
 -- see: https://github.com/sol/hpack
 
-name:           ringell-properties
+name:           pcf-gen
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/ringell-properties#readme>
-homepage:       https://github.com/githubuser/ringell-properties#readme
-bug-reports:    https://github.com/githubuser/ringell-properties/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/pcf-gen#readme>
+homepage:       https://github.com/githubuser/pcf-gen#readme
+bug-reports:    https://github.com/githubuser/pcf-gen/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2022 Author name here
@@ -21,46 +21,53 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/ringell-properties
+  location: https://github.com/githubuser/pcf-gen
 
 library
   exposed-modules:
-      EvalL
-      EvalR
       Lib
-      Semantic
-      Unroll
+      STLC
   other-modules:
-      Paths_ringell_properties
+      Paths_pcf_gen
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
+    , mtl
+    , quickcheck-transformer
+    , unbound-generics
   default-language: Haskell2010
 
-executable ringell-properties-exe
+executable pcf-gen-exe
   main-is: Main.hs
   other-modules:
-      Paths_ringell_properties
+      Paths_pcf_gen
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
-    , ringell-properties
+      QuickCheck
+    , base >=4.7 && <5
+    , mtl
+    , pcf-gen
+    , quickcheck-transformer
+    , unbound-generics
   default-language: Haskell2010
 
-test-suite ringell-properties-test
+test-suite pcf-gen-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Generator
-      Paths_ringell_properties
+      Paths_pcf_gen
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck >=2.14.2 && <3
+      QuickCheck
     , base >=4.7 && <5
-    , ringell-properties
+    , mtl
+    , pcf-gen
+    , quickcheck-transformer
+    , unbound-generics
   default-language: Haskell2010

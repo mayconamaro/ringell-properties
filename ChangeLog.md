@@ -1,3 +1,3 @@
-# Changelog for ringell-properties
+# Changelog for pcf-gen
 
 ## Unreleased changes
